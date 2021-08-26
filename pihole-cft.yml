@@ -2,6 +2,10 @@ Parameters:
   sshKey:
     Description: EC2 keypair for SSH access
     Type: String
+  awsRegion:
+    Description: Region for the stack to sit in
+    Type: String
+    Default: 'us-east-2a'
 Resources:
   PiholeInstance:
     Type : 'AWS::EC2::Instance'
@@ -11,12 +15,18 @@ Resources:
       KeyName: !Ref sshKey
       ImageId: ami-00399ec92321828f5
       InstanceType: t2.micro
-      Volumes:
-        - !Ref PiholeEBSDisk
+      AvailabilityZone: !Ref awsRegion
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: 30
+            DeleteOnTermination: true
+            Encrypted: true
   PiholeSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: DNS server rules
+      GroupDescription: pihole DNS server rules
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -32,10 +42,5 @@ Resources:
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 80
-          toPort: 80
+          ToPort: 80
           CidrIp: 0.0.0.0/0
-  PiholeEBSDisk:
-    Type: 'AWS::EC2::Volume'
-    Properties:
-      VolumeType: gp3
-      Size: 30
