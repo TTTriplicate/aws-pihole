@@ -15,6 +15,7 @@ Resources:
       KeyName: !Ref sshKey
       ImageId: ami-00399ec92321828f5
       InstanceType: t2.micro
+      IamInstanceProfile: !Ref PiholeInstanceProfile
       AvailabilityZone: !Ref awsRegion
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
@@ -48,9 +49,9 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       Description: Role for the pi-hole
+      Path: /
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
-        Path: /
         Statement:
           - Effect: Allow
             Principal:
@@ -62,3 +63,9 @@ Resources:
                   - '-'
                   - - !Ref awsRegion
                     - pihole
+  PiholeInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: PiholeInstanceProfile
+      Roles:
+        - !Ref PiholeRole
