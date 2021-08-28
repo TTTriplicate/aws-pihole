@@ -44,3 +44,21 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+  PiholeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Role for the pi-hole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Path: /
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      RoleName: !Join
+                  - '-'
+                  - - !Ref awsRegion
+                    - pihole
